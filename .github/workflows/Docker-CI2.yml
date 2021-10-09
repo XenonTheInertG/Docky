@@ -1,4 +1,4 @@
-"name: Docker-CI2
+name: Docker-CI2
 
 on:
   push:
@@ -45,5 +45,5 @@ jobs:
             ghcr.io/XenonTheInertG/wetty:${{ github.sha }}
             ghcr.io/XenonTheInertG/wetty:latest
           cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache"
+          cache-to: type=local,dest=/tmp/.buildx-cache
  https://raw.githubusercontent.com/lemniskett/wetty-docker/master/.github/workflows/build.yml#:~:text=name%3A%20Build%20Master%0A%0Aon,dest%3D/tmp/.buildx-cache
