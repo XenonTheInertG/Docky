@@ -1,21 +1,83 @@
-FROM python:3-slim-buster
+# Base Image: Ubuntu
+FROM ubuntu:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
+# Working Directory
+WORKDIR /root
 
-RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends \
-        apt-utils git g++ gcc autoconf automake \
-        m4 libtool qt4-qmake make libqt4-dev libcurl4-openssl-dev \
-        libcrypto++-dev libsqlite3-dev libc-ares-dev \
-        libsodium-dev libnautilus-extension-dev \
-        libssl-dev libfreeimage-dev swig \
-    && apt-get -y autoremove
+# Maintainer
+MAINTAINER XenonTheInertG <XenonTheInertG@outlook.com>
 
-# Installing mega sdk python binding
-ENV MEGA_SDK_VERSION '3.8.1'
-RUN git clone https://github.com/meganz/sdk.git sdk && cd sdk \
-    && git checkout v$MEGA_SDK_VERSION \
-    && ./autogen.sh && ./configure --disable-silent-rules --enable-python --with-sodium --disable-examples \
-    && make -j$(nproc --all) \
-    && cd bindings/python/ && python3 setup.py bdist_wheel \
-    && cd dist/ && pip3 install --no-cache-dir megasdk-$MEGA_SDK_VERSION-*.whl
+# Delete the profile files (we'll copy our own in the next step)
+RUN \
+rm -f \
+    /etc/profile \
+    ~/.profile \
+    ~/.bashrc
+
+# Copy the Proprietary Files
+COPY ./proprietary /
+
+# apt update
+RUN apt update
+
+# Install sudo
+RUN apt install apt-utils sudo -y
+
+# tzdata
+ENV TZ Asia/Dhaka
+
+RUN \
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata \
+&& ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
+&& apt-get install -y tzdata \
+&& dpkg-reconfigure --frontend noninteractive tzdata
+
+# Install git and ssh
+RUN sudo apt install git ssh -y
+
+# Configure git
+ENV GIT_USERNAME XenonTheInertG
+ENV GIT_EMAIL XenonTheInertG@outlook.com
+RUN \
+    git config --global user.name $GIT_USERNAME \
+&&  git config --global user.email $GIT_EMAIL
+
+# Install Packages
+RUN \
+sudo apt install \
+    curl wget aria2 tmate python2 python3 silversearch* \
+    iputils-ping iproute2 \
+    nano rsync rclone tmux screen openssh-server \
+    python3-pip adb fastboot jq npm neofetch mlocate \
+    zip unzip tar ccache \
+    cpio lzma \
+    -y
+
+# Filesystems
+RUN \
+sudo apt install \
+    erofs-utils \
+    -y
+
+RUN \
+sudo pip install \
+    twrpdtgen
+
+# Install schedtool and Java
+RUN \
+    sudo apt install \
+        schedtool openjdk-8-jdk \
+    -y
+
+# Setup Android Build Environment
+RUN \
+git clone https://github.com/akhilnarang/scripts.git /tmp/scripts \
+&& sudo bash /tmp/scripts/setup/android_build_env.sh \
+&& rm -rf /tmp/scripts
+
+# Use python2 as the Default python
+RUN \
+sudo ln -sf /usr/bin/python2 /usr/bin/python
+
+# Run bash
+CMD ["bash"]
