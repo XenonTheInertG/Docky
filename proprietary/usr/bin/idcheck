@@ -39,20 +39,17 @@ def ldcheck(files, libpath, printalldefined, printresolved, demangle):
     for filename in libswithpath:
         for sym in readsymbols(filename, nmopts):
             if sym["type"] == "U":
-                resolved = syms.get(sym["name"])
-                if resolved:
+                if resolved := syms.get(sym["name"]):
                     if filename in libsused:
                         libsused.add(resolved["file"])
                     if printresolved:
                         print("{0:25} {1:25} {2} {3}".format(filename, resolved["file"], resolved["type"], sym["name"]))
                 else:
                     print("{0:25} {1:25} U {2}".format(filename, "UNRESOLVED #####", sym["name"]))
-            else:
-                if printalldefined:
-                    print("{0:25}                  {1}".format(filename, sym["line"]))
+            elif printalldefined:
+                print("{0:25}                  {1}".format(filename, sym["line"]))
 
-    unused = set(libswithpath) - libsused
-    if unused:
+    if unused := set(libswithpath) - libsused:
         print("unused:", unused)
 
 
