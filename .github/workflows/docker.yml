@@ -23,9 +23,3 @@ jobs:
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build & push to ghcr.io
-        run: |
-             echo ${{ secrets.GH_TOKEN }} | docker login ghcr.io -u xenontheinertg@outlook.com --password-stdin
-             docker build -t ghcr.io/xenontheinertg@outlook.com/arch:latest .
-             echo "Build Completed Successfully!"
-             docker push ghcr.io/xenontheinertg@outlook.com/arch:latest
