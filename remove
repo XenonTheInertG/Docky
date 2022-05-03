@@ -3,10 +3,8 @@
 /etc/locale.conf
 /etc/locale.gen
 /etc/profile
-/etc/makepkg.conf
 /usr/bin/transfer
 /usr/bin/ldcheck
 /usr/bin/libneeds
 /usr/bin/yay
 /root/.bashrc
-/root/.profile
